@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 120,
+  "semi": false,
+  "trailingComma": "none",
+  "arrowParens": "always",
+  "sortImports": {
+    "newlinesBetween": false
+  },
+  "ignorePatterns": ["repos/**", "**/node_modules/**", "**/dist/**", "**/out/**", "**/coverage/**", "bun.lock"]
+}

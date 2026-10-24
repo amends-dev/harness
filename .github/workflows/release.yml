@@ -1,0 +1,48 @@
+name: Release
+
+# Releases the packages with Changesets (.changeset/config.json). While changesets are pending on
+# main, this keeps a release pull request open with the versions and changelogs they make; merging
+# it publishes each package whose version npm does not have yet, through npm's trusted publishing,
+# then tags it and creates its GitHub release. It needs the repository's `npm` environment, which
+# only main may use and which each package's trusted publisher on npm names, and in it the
+# `RELEASE_GITHUB_TOKEN` that opens the release pull request.
+on:
+  push:
+    branches: [main]
+
+# One release at a time; a newer push waits rather than interrupting a publish.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # npm trusts this workflow in this environment alone, which only main may use.
+    environment: npm
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The action pushes the release branch with the token below, so CI runs on its pull
+          # request, which a push with the workflow's own token would not start.
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      # Trusted publishing needs npm 11.5.1 or later, which Node 24 ships.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: changesets/action@v2.1.2
+        with:
+          version-script: bun run changeset-version
+          publish-script: bun run changeset-publish
+          commit-message: Release the packages
+          pr-title: Release the packages
+          github-token: ${{ secrets.RELEASE_GITHUB_TOKEN }}

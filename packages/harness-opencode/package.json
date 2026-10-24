@@ -1,0 +1,52 @@
+{
+  "name": "@amends-dev/harness-opencode",
+  "version": "0.2.0",
+  "description": "opencode as an agent for the @amends-dev/harness contract: opencode works in a sandbox behind its bridge, which the agent's template installs there.",
+  "keywords": [
+    "agent",
+    "ai",
+    "effect",
+    "harness",
+    "opencode",
+    "sandbox"
+  ],
+  "homepage": "https://github.com/amends-dev/harness/tree/main/packages/harness-opencode#readme",
+  "bugs": {
+    "url": "https://github.com/amends-dev/harness/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amends-dev/harness.git",
+    "directory": "packages/harness-opencode"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts",
+    "./internal/*": null
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@amends-dev/harness": "workspace:^",
+    "@amends-dev/sandbox": "catalog:",
+    "@effect/platform-bun": "catalog:"
+  },
+  "devDependencies": {
+    "@amends-dev/sandbox-daytona": "catalog:",
+    "@amends-dev/sandbox-local": "catalog:",
+    "@effect/vitest": "catalog:",
+    "effect": "catalog:"
+  },
+  "peerDependencies": {
+    "effect": "catalog:"
+  }
+}

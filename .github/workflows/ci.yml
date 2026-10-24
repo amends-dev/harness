@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # A new push supersedes a pull request's earlier run; every commit on main keeps its own.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+# Independent jobs run in parallel, so the run takes as long as its slowest job. The live suites
+# need credentials and real agents, so here they skip and the suites over fakes run instead.
+jobs:
+  static:
+    name: Lint, format, and generated files
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Lint
+        run: bun run lint
+      - name: Format
+        run: bun run format:check
+      - name: Package declarations
+        run: bun run check:packages
+      - name: Generated barrels
+        run: bun run check:barrels
+
+  types:
+    name: Type check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Type check
+        run: bun run typecheck
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Test
+        run: bun run test --maxWorkers=2
+
+  # Each package as npm gets it, in a project that installs its other dependencies, Effect among
+  # them, from npm at the newest versions the package allows.
+  distributions:
+    name: Published packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Check the distributions
+        run: bun run dist check
+
+  # One required check that succeeds only when every job above succeeds.
+  check:
+    name: Check
+    if: always()
+    needs: [static, types, tests, distributions]
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Require every job to pass
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: echo "$RESULTS" | jq -e 'all(.[]; .result == "success")'

@@ -1,0 +1,13 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: packages
+      run: bun run check:packages
+    - name: barrels
+      run: bun run check:barrels
+    - name: typecheck
+      run: bun run typecheck
+    - name: lint
+      run: bun run lint
+    - name: format
+      run: bun run format:check

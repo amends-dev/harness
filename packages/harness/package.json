@@ -1,0 +1,49 @@
+{
+  "name": "@amends-dev/harness",
+  "version": "0.2.0",
+  "description": "Runs an agent, such as opencode or one in your own process over an Effect AI language model, and streams every agent's turns in one format.",
+  "keywords": [
+    "agent",
+    "ai",
+    "effect",
+    "harness",
+    "mcp",
+    "opencode",
+    "sandbox"
+  ],
+  "homepage": "https://github.com/amends-dev/harness/tree/main/packages/harness#readme",
+  "bugs": {
+    "url": "https://github.com/amends-dev/harness/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amends-dev/harness.git",
+    "directory": "packages/harness"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts",
+    "./internal/*": null
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@amends-dev/sandbox": "catalog:"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "effect": "catalog:"
+  },
+  "peerDependencies": {
+    "effect": "catalog:"
+  }
+}

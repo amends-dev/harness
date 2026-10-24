@@ -1,0 +1,51 @@
+{
+  "name": "@amends-dev/harness-codex",
+  "version": "0.2.0",
+  "description": "Codex app-server as an agent for the amends harness contract",
+  "keywords": [
+    "agent",
+    "ai",
+    "codex",
+    "effect",
+    "harness",
+    "sandbox"
+  ],
+  "homepage": "https://github.com/amends-dev/harness/tree/main/packages/harness-codex#readme",
+  "bugs": {
+    "url": "https://github.com/amends-dev/harness/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amends-dev/harness.git",
+    "directory": "packages/harness-codex"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts",
+    "./internal/*": null
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@amends-dev/harness": "workspace:^",
+    "@amends-dev/sandbox": "catalog:",
+    "@effect/platform-bun": "catalog:"
+  },
+  "devDependencies": {
+    "@amends-dev/sandbox-local": "catalog:",
+    "@effect/vitest": "catalog:",
+    "effect": "catalog:"
+  },
+  "peerDependencies": {
+    "effect": "catalog:"
+  }
+}
