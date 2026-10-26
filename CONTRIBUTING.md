@@ -48,6 +48,9 @@ Import from the installed packages, never from `repos/`.
 | `bun run dist`           | Build or check a package as npm gets it                                  |
 | `bun changeset`          | Describe a change to the packages for their next release                 |
 
+The [justfile](justfile) runs the same commands with [just](https://just.systems), such as
+`just check` and `just test`; `just` lists them.
+
 Run `bun run check` after every change and the tests after any change in behavior.
 
 Before each commit, [Lefthook](https://lefthook.dev) runs the package, generated-barrel, type,
@@ -96,6 +99,12 @@ endpoints and session operations it supports and how to run its live suites.
 Merging changesets to `main` keeps a release pull request open; merging that publishes each
 package whose version npm does not have yet, through npm's trusted publishing, as
 [the release workflow](.github/workflows/release.yml) describes.
+
+What the workflow needs from GitHub is the Alchemy stack in [stacks/github.ts](stacks/github.ts):
+the `npm` environment, which only `main` may use, with the token that opens the release pull
+request, and the ruleset that lets `main` change only through pull requests whose checks pass.
+Maintainers apply it with `just github`, which installs Alchemy in `stacks/` on its own, apart
+from the packages.
 
 ## Updating Effect
 

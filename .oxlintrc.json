@@ -108,13 +108,13 @@
   },
   "overrides": [
     {
-      "files": ["**/test/**", "**/*.test.ts", "**/scripts/**"],
+      "files": ["**/test/**", "**/*.test.ts", "**/scripts/**", "stacks/**"],
       "rules": {
         "eslint/no-console": "off"
       }
     },
     {
-      "files": ["**/test/**", "**/*.test.ts", "**/scripts/**", "**/*.config.ts"],
+      "files": ["**/test/**", "**/*.test.ts", "**/scripts/**", "stacks/**", "**/*.config.ts"],
       "rules": {
         "no-restricted-imports": [
           "error",

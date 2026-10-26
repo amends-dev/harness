@@ -5,7 +5,7 @@ name: Release
 # it publishes each package whose version npm does not have yet, through npm's trusted publishing,
 # then tags it and creates its GitHub release. It needs the repository's `npm` environment, which
 # only main may use and which each package's trusted publisher on npm names, and in it the
-# `RELEASE_GITHUB_TOKEN` that opens the release pull request.
+# `RELEASE_GITHUB_TOKEN` that opens the release pull request; stacks/github.ts sets up both.
 on:
   push:
     branches: [main]

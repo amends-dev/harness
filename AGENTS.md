@@ -21,6 +21,10 @@ The hook checks files without modifying or staging them. Fix failures before
 committing; `bun run lefthook run pre-commit --force` runs the same checks manually,
 even when no files are staged. CI runs these checks, the tests, and the distribution checks as
 parallel jobs.
+The `justfile` gives the package scripts as recipes, and `just github` applies
+`stacks/github.ts`, an Alchemy stack of the repository's GitHub settings. `stacks/` has its own
+manifest and lockfile, so Alchemy stays out of the root install and CI; `just github` typechecks
+the stack before deploying it.
 Keep these diagnostics enabled in `tsconfig.base.json`: the pinned Oxlint version is
 newer than the versions supported by the Effect Oxlint patch, so Effect checks
 currently run through TypeScript. Check compatibility before changing this setup.
