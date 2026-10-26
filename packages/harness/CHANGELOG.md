@@ -1,5 +1,11 @@
 # @amends-dev/harness
 
+## 0.2.1
+
+### Patch Changes
+
+- [#1](https://github.com/amends-dev/harness/pull/1) [`8c1b63e`](https://github.com/amends-dev/harness/commit/8c1b63ed4f0f755b93c739ba91d1f55a973ffcc2) Thanks [@saribmah](https://github.com/saribmah)! - Moved to its own repository, [amends-dev/harness](https://github.com/amends-dev/harness), which its links on npm and its provenance now name.
+
 ## 0.2.0
 
 ### Minor Changes

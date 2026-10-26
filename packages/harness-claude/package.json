@@ -1,6 +1,6 @@
 {
   "name": "@amends-dev/harness-claude",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Claude Agent SDK behind the amends sandbox bridge.",
   "keywords": [
     "agent",
