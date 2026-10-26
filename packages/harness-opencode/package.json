@@ -1,6 +1,6 @@
 {
   "name": "@amends-dev/harness-opencode",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "opencode as an agent for the @amends-dev/harness contract: opencode works in a sandbox behind its bridge, which the agent's template installs there.",
   "keywords": [
     "agent",
