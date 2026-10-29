@@ -103,9 +103,11 @@ type JsonFormat = Extract<Agent.TurnOptions["responseFormat"], { readonly type: 
 type Emit = (parts: ReadonlyArray<StreamPart.StreamPart>) => Effect.Effect<unknown>
 
 /**
- * Stands in for a host's tool: the model sees the tool as the host declares it, its JSON schema
- * sent as strictly as the host says, and the stand-in answers each call with the result the host
- * submits, as it came. The session, which runs the host's tool, checks the call's params.
+ * Stands in for a host's tool: the model sees the tool as the host declares it, and the stand-in
+ * answers each call with the result the host submits, as it came. The session, which runs the
+ * host's tool, checks the call's params. A provider sends the stand-in's JSON schema as it is,
+ * without the changes its strict mode needs, so the stand-in is strict only when the host's tool
+ * says so, as Effect's MCP tools are.
  */
 const standInFor = (tool: Tool.Any) =>
   Tool.dynamic(tool.name, {
@@ -114,7 +116,7 @@ const standInFor = (tool: Tool.Any) =>
     success: Schema.Unknown,
     failure: Schema.Unknown,
     failureMode: "return"
-  }).annotate(Tool.Strict, Tool.getStrictMode(tool))
+  }).annotate(Tool.Strict, Tool.getStrictMode(tool) ?? false)
 
 /**
  * The agent, which makes the language model of each of its endpoints with `Models.LanguageModels`,

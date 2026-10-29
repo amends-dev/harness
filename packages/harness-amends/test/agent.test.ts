@@ -149,6 +149,27 @@ layer(BunServices.layer)("AmendsAgent", (it) => {
     }).pipe(Effect.provide(MathHandlers))
   )
 
+  it.effect("offers a host's tool to the model as strict only when the host says so", () => {
+    const Lookup = Tool.make("Lookup", { parameters: Schema.Struct({ key: Schema.String }), success: Schema.String })
+    const StrictLookup = Tool.make("StrictLookup", {
+      parameters: Schema.Struct({ key: Schema.String }),
+      success: Schema.String
+    }).annotate(Tool.Strict, true)
+    const LookupToolkit = Toolkit.make(Lookup, StrictLookup)
+    return Effect.gen(function* () {
+      const { model, requests } = yield* makeScriptedModel(() => answer("done"))
+      const session = yield* Harness.make(yield* makeAgent({ model })).createSession({ id })
+
+      yield* session.generate({ prompt: "look it up", toolkit: yield* LookupToolkit })
+
+      expect((requests[0]?.tools ?? []).map(Tool.getStrictMode)).toEqual([false, true])
+    }).pipe(
+      Effect.provide(
+        LookupToolkit.toLayer({ Lookup: () => Effect.succeed("value"), StrictLookup: () => Effect.succeed("value") })
+      )
+    )
+  })
+
   it.effect("offers the host's tools as the host declares them, and gives the model their results", () =>
     Effect.gen(function* () {
       const { model, requests } = yield* makeScriptedModel((request) => {

@@ -83,8 +83,11 @@ why, so the model can try again. That keeps the model's work in its directory bu
 `bash` reaches anything the sandbox can.
 
 The host's tools reach the model through stand-ins, which answer each call with the result the
-host submits, and carry the tool's JSON schema and its `Tool.Strict` annotation as the host gave
-them; the session, which runs the host's tool, checks the call's params. A host's tool named as
+host submits, and carry the tool's JSON schema as the host gave it; the session, which runs the
+host's tool, checks the call's params. A provider sends that JSON schema as it is, without the
+changes its strict mode needs, so a stand-in is strict only when the host's tool sets `Tool.Strict`
+to `true`, and such a tool's schema must be one the provider takes in strict mode, such as
+Anthropic's, which needs `additionalProperties: false` on every object. A host's tool named as
 one of the agent's own fails the turn with `UnsupportedError`. `Tools.toolkit` and
 `Tools.layer` give the tools to a program of your own.
 
