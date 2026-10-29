@@ -10,8 +10,14 @@ import type * as LanguageModel from "effect/ai/LanguageModel"
 import * as Response from "effect/ai/Response"
 import type * as Tool from "effect/ai/Tool"
 import * as Toolkit from "effect/ai/Toolkit"
+import * as Arr from "effect/Array"
 import * as Effect from "effect/Effect"
 import { flow } from "effect/Function"
+import * as Headers from "effect/http/Headers"
+import * as UrlParams from "effect/http/UrlParams"
+import * as Predicate from "effect/Predicate"
+import * as Record from "effect/Record"
+import * as Redacted from "effect/Redacted"
 import * as Schema from "effect/Schema"
 
 /**
@@ -91,12 +97,61 @@ export const turnFinishOf = (steps: ReadonlyArray<Response.FinishPart>, failed: 
     })
   )
 
-/** The `error` part reporting the model's failure, with the `AiError` as JSON. */
+/**
+ * The `error` part reporting the model's failure, with the `AiError` as JSON. Effect keeps the
+ * credentials in a failed request's headers and URL parameters as `Redacted` values, and encoding
+ * them as JSON reveals them, so the JSON is redacted again by name, with Effect's own names.
+ */
 export const errorPartOf = (error: AiError.AiError) =>
-  Effect.map(encodeAiError(error), (json): StreamPart.StreamPart => ({
-    type: "error",
-    error: json
-  }))
+  Effect.gen(function* () {
+    const json = yield* encodeAiError(error)
+    const names: RedactedNames = {
+      headers: yield* Headers.CurrentRedactedNames,
+      urlParams: yield* UrlParams.CurrentRedactedNames
+    }
+    const part: StreamPart.StreamPart = { type: "error", error: redactCredentials(json, names) }
+    return part
+  })
+
+/** The names of the headers and URL parameters whose values are credentials. */
+interface RedactedNames {
+  readonly headers: ReadonlyArray<string | RegExp>
+  readonly urlParams: ReadonlyArray<string | RegExp>
+}
+
+const isJsonArray = (json: Schema.Json): json is Schema.JsonArray => Arr.isArray(json)
+
+const isJsonObject = (json: Schema.Json): json is Schema.JsonObject => Predicate.isObject(json) && !isJsonArray(json)
+
+const isStringPair = (json: Schema.Json): json is readonly [string, string] =>
+  isJsonArray(json) && json.length === 2 && Predicate.isString(json[0]) && Predicate.isString(json[1])
+
+const shown = (value: string | Redacted.Redacted<string>) => (Redacted.isRedacted(value) ? "<redacted>" : value)
+
+/** `json` with the credentials in every `headers` record and `urlParams` list in it redacted. */
+const redactCredentials = (json: Schema.Json, names: RedactedNames): Schema.Json => {
+  if (isJsonArray(json)) {
+    return json.map((item) => redactCredentials(item, names))
+  }
+  if (!isJsonObject(json)) {
+    return json
+  }
+  return Record.map(json, (value, key): Schema.Json => {
+    if (key === "headers" && isJsonObject(value)) {
+      return Record.map(
+        Headers.redact(Headers.fromInput(Record.filter(value, Predicate.isString)), names.headers),
+        shown
+      )
+    }
+    if (key === "urlParams" && isJsonArray(value)) {
+      return UrlParams.redact(UrlParams.fromInput(value.filter(isStringPair)), names.urlParams).map(([name, param]) => [
+        name,
+        shown(param)
+      ])
+    }
+    return redactCredentials(value, names)
+  })
+}
 
 // Encoding what Effect AI decoded cannot fail.
 const encodeStreamPart = flow(Schema.encodeEffect(Response.StreamPart(Toolkit.empty)), Effect.orDie)

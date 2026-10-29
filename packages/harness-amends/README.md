@@ -94,7 +94,8 @@ one of the agent's own fails the turn with `UnsupportedError`. `Tools.toolkit` a
 takes as many as the model needs. A turn asking for JSON ends with a step in which the model
 answers the conversation so far, without tools, with the JSON the schema describes, through Effect
 AI's `generateObject`; the session decodes the answer. A model's failure ends the turn with an
-`error` part holding the `AiError` as JSON, and a `finish` whose reason is `error`.
+`error` part holding the `AiError` as JSON, and a `finish` whose reason is `error`. The headers and
+URL parameters Effect redacts, such as `authorization` and `x-api-key`, read `<redacted>` there.
 
 Before each step, once the conversation fills 80% of the model's context window, the agent
 compacts it: the model summarizes all but the latest messages, which the conversation keeps as

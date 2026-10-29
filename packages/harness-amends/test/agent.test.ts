@@ -2,7 +2,7 @@ import { Agent, GenerateResult, Harness, Session } from "@amends-dev/harness"
 import type { Sandbox } from "@amends-dev/sandbox"
 import { BunServices } from "@effect/platform-bun"
 import { expect, layer } from "@effect/vitest"
-import { Deferred, Effect, Fiber, Path, Schema, Stream } from "effect"
+import { Deferred, Effect, Fiber, Path, Redacted, Schema, Stream } from "effect"
 import { AiError, type LanguageModel, Prompt, type Response, Tool, Toolkit } from "effect/ai"
 import {
   answer,
@@ -283,6 +283,60 @@ layer(BunServices.layer)("AmendsAgent", (it) => {
         { type: "finish", reason: "error" }
       ])
       expect(error).toMatchObject({ _tag: "HarnessError", reason: { _tag: "TurnFailedError" } })
+    })
+  )
+
+  it.effect("redacts the credentials of a failed request in its error part", () =>
+    Effect.gen(function* () {
+      const failure = AiError.make({
+        module: "Scripted",
+        method: "streamText",
+        reason: new AiError.InvalidRequestError({
+          description: "rejected",
+          http: {
+            request: {
+              method: "POST",
+              url: "https://scripted.invalid/v1/messages",
+              urlParams: [
+                ["sig", Redacted.make("secret-signature")],
+                ["page", "2"]
+              ],
+              headers: {
+                authorization: Redacted.make("Bearer secret-token"),
+                "x-api-key": Redacted.make("secret-key"),
+                "anthropic-beta": "oauth-2025-04-20"
+              }
+            }
+          }
+        })
+      })
+      const { model } = yield* makeScriptedModel(() => Stream.fail(failure))
+      const session = yield* Harness.make(yield* makeAgent({ model })).createSession({ id })
+
+      const parts = yield* Stream.runCollect(session.stream({ prompt: "hello" }))
+
+      expect(JSON.stringify(parts)).not.toContain("secret")
+      expect(parts[0]).toMatchObject({
+        type: "error",
+        error: {
+          reason: {
+            _tag: "InvalidRequestError",
+            http: {
+              request: {
+                urlParams: [
+                  ["sig", "<redacted>"],
+                  ["page", "2"]
+                ],
+                headers: {
+                  authorization: "<redacted>",
+                  "x-api-key": "<redacted>",
+                  "anthropic-beta": "oauth-2025-04-20"
+                }
+              }
+            }
+          }
+        }
+      })
     })
   )
 
