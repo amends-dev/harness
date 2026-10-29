@@ -1,6 +1,6 @@
 {
   "name": "@amends-dev/harness-amends",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "An agent in your own process for the @amends-dev/harness contract: a loop over an Effect AI language model, with tools for the files and the shell of a sandbox.",
   "keywords": [
     "agent",

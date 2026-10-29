@@ -1,6 +1,6 @@
 {
   "name": "@amends-dev/harness-codex",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Codex app-server as an agent for the amends harness contract",
   "keywords": [
     "agent",

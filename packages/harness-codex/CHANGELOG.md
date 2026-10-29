@@ -1,5 +1,13 @@
 # @amends-dev/harness-codex
 
+## 0.2.2
+
+### Patch Changes
+
+- [#3](https://github.com/amends-dev/harness/pull/3) [`d2d26c5`](https://github.com/amends-dev/harness/commit/d2d26c5b7e476d52267cbc358c8f4181bd0ca705) Thanks [@saribmah](https://github.com/saribmah)! - Required Effect 4.0 (`~4.0.5`) rather than any Effect 4 release (`^4.0.5`). Effect 4.1.0 removed `effect/Crypto`, which these packages import, so a new project that installed them got 4.1.0 and could not load them.
+- Updated dependencies [[`d2d26c5`](https://github.com/amends-dev/harness/commit/d2d26c5b7e476d52267cbc358c8f4181bd0ca705)]:
+  - @amends-dev/harness@0.2.2
+
 ## 0.2.1
 
 ### Patch Changes
