@@ -83,8 +83,11 @@ why, so the model can try again. That keeps the model's work in its directory bu
 `bash` reaches anything the sandbox can.
 
 The host's tools reach the model through stand-ins, which answer each call with the result the
-host submits, and carry the tool's JSON schema and its `Tool.Strict` annotation as the host gave
-them; the session, which runs the host's tool, checks the call's params. A host's tool named as
+host submits, and carry the tool's JSON schema as the host gave it; the session, which runs the
+host's tool, checks the call's params. A provider sends that JSON schema as it is, without the
+changes its strict mode needs, so a stand-in is strict only when the host's tool sets `Tool.Strict`
+to `true`, and such a tool's schema must be one the provider takes in strict mode, such as
+Anthropic's, which needs `additionalProperties: false` on every object. A host's tool named as
 one of the agent's own fails the turn with `UnsupportedError`. `Tools.toolkit` and
 `Tools.layer` give the tools to a program of your own.
 
@@ -94,7 +97,8 @@ one of the agent's own fails the turn with `UnsupportedError`. `Tools.toolkit` a
 takes as many as the model needs. A turn asking for JSON ends with a step in which the model
 answers the conversation so far, without tools, with the JSON the schema describes, through Effect
 AI's `generateObject`; the session decodes the answer. A model's failure ends the turn with an
-`error` part holding the `AiError` as JSON, and a `finish` whose reason is `error`.
+`error` part holding the `AiError` as JSON, and a `finish` whose reason is `error`. The headers and
+URL parameters Effect redacts, such as `authorization` and `x-api-key`, read `<redacted>` there.
 
 Before each step, once the conversation fills 80% of the model's context window, the agent
 compacts it: the model summarizes all but the latest messages, which the conversation keeps as

@@ -7,12 +7,12 @@
       "packages/*"
     ],
     "catalog": {
-      "@effect/ai-anthropic": "4.0.5",
-      "@effect/ai-openai": "4.0.5",
-      "@effect/ai-openai-compat": "4.0.5",
-      "@effect/platform-bun": "4.0.5",
-      "@effect/vitest": "4.0.5",
-      "effect": "4.0.5",
+      "@effect/ai-anthropic": "~4.0.5",
+      "@effect/ai-openai": "~4.0.5",
+      "@effect/ai-openai-compat": "~4.0.5",
+      "@effect/platform-bun": "~4.0.5",
+      "@effect/vitest": "~4.0.5",
+      "effect": "~4.0.5",
       "@amends-dev/sandbox": "0.2.1",
       "@amends-dev/sandbox-daytona": "0.2.0",
       "@amends-dev/sandbox-local": "0.2.0",

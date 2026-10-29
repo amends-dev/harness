@@ -68,7 +68,7 @@ const readWorkspace = async (): Promise<Workspace> => {
  * The range the distribution depends on `name` with, for `version` as the repository writes it: a
  * `workspace:` version as Bun publishes it, so `workspace:^` is a caret range of the package's
  * version and `workspace:*` the version itself, and a `catalog:` one as a caret range of the
- * catalog's version.
+ * catalog's version, or as the catalog's own range when it gives one, such as `~4.0.5`.
  */
 const rangeOf = async (name: string, version: string, workspace: Workspace) => {
   if (version.startsWith("workspace:")) {

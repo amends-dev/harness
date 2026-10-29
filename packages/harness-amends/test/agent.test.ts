@@ -2,7 +2,7 @@ import { Agent, GenerateResult, Harness, Session } from "@amends-dev/harness"
 import type { Sandbox } from "@amends-dev/sandbox"
 import { BunServices } from "@effect/platform-bun"
 import { expect, layer } from "@effect/vitest"
-import { Deferred, Effect, Fiber, Path, Schema, Stream } from "effect"
+import { Deferred, Effect, Fiber, Path, Redacted, Schema, Stream } from "effect"
 import { AiError, type LanguageModel, Prompt, type Response, Tool, Toolkit } from "effect/ai"
 import {
   answer,
@@ -149,6 +149,27 @@ layer(BunServices.layer)("AmendsAgent", (it) => {
     }).pipe(Effect.provide(MathHandlers))
   )
 
+  it.effect("offers a host's tool to the model as strict only when the host says so", () => {
+    const Lookup = Tool.make("Lookup", { parameters: Schema.Struct({ key: Schema.String }), success: Schema.String })
+    const StrictLookup = Tool.make("StrictLookup", {
+      parameters: Schema.Struct({ key: Schema.String }),
+      success: Schema.String
+    }).annotate(Tool.Strict, true)
+    const LookupToolkit = Toolkit.make(Lookup, StrictLookup)
+    return Effect.gen(function* () {
+      const { model, requests } = yield* makeScriptedModel(() => answer("done"))
+      const session = yield* Harness.make(yield* makeAgent({ model })).createSession({ id })
+
+      yield* session.generate({ prompt: "look it up", toolkit: yield* LookupToolkit })
+
+      expect((requests[0]?.tools ?? []).map(Tool.getStrictMode)).toEqual([false, true])
+    }).pipe(
+      Effect.provide(
+        LookupToolkit.toLayer({ Lookup: () => Effect.succeed("value"), StrictLookup: () => Effect.succeed("value") })
+      )
+    )
+  })
+
   it.effect("offers the host's tools as the host declares them, and gives the model their results", () =>
     Effect.gen(function* () {
       const { model, requests } = yield* makeScriptedModel((request) => {
@@ -283,6 +304,60 @@ layer(BunServices.layer)("AmendsAgent", (it) => {
         { type: "finish", reason: "error" }
       ])
       expect(error).toMatchObject({ _tag: "HarnessError", reason: { _tag: "TurnFailedError" } })
+    })
+  )
+
+  it.effect("redacts the credentials of a failed request in its error part", () =>
+    Effect.gen(function* () {
+      const failure = AiError.make({
+        module: "Scripted",
+        method: "streamText",
+        reason: new AiError.InvalidRequestError({
+          description: "rejected",
+          http: {
+            request: {
+              method: "POST",
+              url: "https://scripted.invalid/v1/messages",
+              urlParams: [
+                ["sig", Redacted.make("secret-signature")],
+                ["page", "2"]
+              ],
+              headers: {
+                authorization: Redacted.make("Bearer secret-token"),
+                "x-api-key": Redacted.make("secret-key"),
+                "anthropic-beta": "oauth-2025-04-20"
+              }
+            }
+          }
+        })
+      })
+      const { model } = yield* makeScriptedModel(() => Stream.fail(failure))
+      const session = yield* Harness.make(yield* makeAgent({ model })).createSession({ id })
+
+      const parts = yield* Stream.runCollect(session.stream({ prompt: "hello" }))
+
+      expect(JSON.stringify(parts)).not.toContain("secret")
+      expect(parts[0]).toMatchObject({
+        type: "error",
+        error: {
+          reason: {
+            _tag: "InvalidRequestError",
+            http: {
+              request: {
+                urlParams: [
+                  ["sig", "<redacted>"],
+                  ["page", "2"]
+                ],
+                headers: {
+                  authorization: "<redacted>",
+                  "x-api-key": "<redacted>",
+                  "anthropic-beta": "oauth-2025-04-20"
+                }
+              }
+            }
+          }
+        }
+      })
     })
   )
 

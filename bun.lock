@@ -23,7 +23,7 @@
     },
     "packages/harness": {
       "name": "@amends-dev/harness",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "dependencies": {
         "@amends-dev/sandbox": "catalog:",
       },
@@ -37,7 +37,7 @@
     },
     "packages/harness-amends": {
       "name": "@amends-dev/harness-amends",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "dependencies": {
         "@amends-dev/harness": "workspace:^",
         "@amends-dev/sandbox": "catalog:",
@@ -57,7 +57,7 @@
     },
     "packages/harness-claude": {
       "name": "@amends-dev/harness-claude",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "dependencies": {
         "@amends-dev/harness": "workspace:^",
         "@amends-dev/sandbox": "catalog:",
@@ -76,7 +76,7 @@
     },
     "packages/harness-codex": {
       "name": "@amends-dev/harness-codex",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "dependencies": {
         "@amends-dev/harness": "workspace:^",
         "@amends-dev/sandbox": "catalog:",
@@ -93,7 +93,7 @@
     },
     "packages/harness-opencode": {
       "name": "@amends-dev/harness-opencode",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "dependencies": {
         "@amends-dev/harness": "workspace:^",
         "@amends-dev/sandbox": "catalog:",
@@ -116,12 +116,12 @@
     "@amends-dev/sandbox-local": "0.2.0",
     "@anthropic-ai/claude-agent-sdk": "0.3.302",
     "@anthropic-ai/sdk": "0.135.0",
-    "@effect/ai-anthropic": "4.0.5",
-    "@effect/ai-openai": "4.0.5",
-    "@effect/ai-openai-compat": "4.0.5",
-    "@effect/platform-bun": "4.0.5",
-    "@effect/vitest": "4.0.5",
-    "effect": "4.0.5",
+    "@effect/ai-anthropic": "~4.0.5",
+    "@effect/ai-openai": "~4.0.5",
+    "@effect/ai-openai-compat": "~4.0.5",
+    "@effect/platform-bun": "~4.0.5",
+    "@effect/vitest": "~4.0.5",
+    "effect": "~4.0.5",
   },
   "packages": {
     "@amends-dev/harness": ["@amends-dev/harness@workspace:packages/harness"],

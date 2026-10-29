@@ -108,12 +108,16 @@ from the packages.
 
 ## Updating Effect
 
-The root manifest's `workspaces.catalog` pins every Effect package, and `repos/effect` holds the
-matching source as a squashed Git subtree of [Effect-TS/effect](https://github.com/Effect-TS/effect),
-at tag `effect@4.0.5`. Upgrade both together:
+The root manifest's `workspaces.catalog` gives every Effect package as a tilde range, such as
+`~4.0.5`, which the packages publish as their own range: a minor release of Effect can remove a
+module they import, as 4.1.0 removed `effect/Crypto`, so they take only the minor they are built
+against. `repos/effect` holds the matching source as a squashed Git subtree of
+[Effect-TS/effect](https://github.com/Effect-TS/effect), at tag `effect@4.0.5`. Upgrade both
+together:
 
-1. Set the new version for every Effect package in the catalog, and run `bun install`.
-2. Commit, then pull the matching tag, replacing `<version>` with the catalog's version:
+1. Set the new version as a tilde range, such as `~4.1.0`, for every Effect package in the catalog,
+   and run `bun install`.
+2. Commit, then pull the matching tag, replacing `<version>` with the version `bun.lock` installed:
 
    ```sh
    git subtree pull --prefix=repos/effect \

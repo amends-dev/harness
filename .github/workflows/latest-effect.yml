@@ -29,6 +29,7 @@ jobs:
       - name: Move the catalog's Effect packages to the newest release
         run: |
           current=$(bun -e 'console.log((await Bun.file("package.json").json()).workspaces.catalog.effect)')
+          current=${current#[~^]}
           version=$(npm view "effect@^$current" version --json | jq -r 'if type == "array" then .[] else . end' | sort -V | tail -1)
           echo "Checking against effect@$version, the newest within ^$current"
           bun -e '
